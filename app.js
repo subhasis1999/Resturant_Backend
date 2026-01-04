@@ -20,40 +20,36 @@
 
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import { dbConnection } from "./database/dbconnection.js";
 import { errorMiddleware } from "./error/error.js";
 import reservationRouter from "./routes/reservationRoute.js";
 
 const app = express();
 
-dotenv.config({ path: "./config/config.env" });
-
-/* ✅ CORS – FIXED */
+/* CORS */
 app.use(cors({
-  origin: "https://resturant-frontend-ashy.vercel.app", // NO slash
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: "https://resturant-frontend-ashy.vercel.app",
+  methods: ["GET", "POST"],
   credentials: true
 }));
-
-/* ✅ Preflight support */
-app.options("*", cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ✅ Root route (optional but recommended) */
+/* Root */
 app.get("/", (req, res) => {
-  res.send("🚀 Backend is running");
+  res.send("🚀 Backend running on Vercel");
 });
 
-/* ✅ Routes */
+/* DB */
+dbConnection().catch(err => {
+  console.error("DB Error:", err.message);
+});
+
+/* Routes */
 app.use("/api/v1/reservation", reservationRouter);
 
-/* ✅ DB Connection */
-dbConnection();
-
-/* ✅ Error middleware (LAST) */
+/* Error middleware */
 app.use(errorMiddleware);
 
 export default app;
